@@ -53,6 +53,7 @@ func main() {
 
 	fmt.Printf("Loyal Customer Count: %d\n", len(loyalCustomers))
 	fmt.Printf("Time elapsed: %v\n", elapsed)
+	fmt.Printf("Loyal Customers: %v\n", loyalCustomers)
 }
 
 // processLogs reads log files for two consecutive days.

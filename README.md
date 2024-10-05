@@ -2,6 +2,12 @@
 
 A tool to identify the most loyal customers by analyzing their activity logs, utilizing concurrent processing using file chunks for improved performance.
 
+# Expected Output
+
+Loyal Customer Count: 1800
+Time elapsed: 21.90775ms
+Loyal Customers: [2 8 13 15 19 22 25 35 40 4 ....................... ]
+
 # Directory structure
 ```
 log-analyzer/

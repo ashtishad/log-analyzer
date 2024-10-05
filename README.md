@@ -16,12 +16,37 @@ A tool to identify the most loyal customers by analyzing their activity logs, ut
 # Expected Output
 ```
 Loyal Customer Count: 180066
-Time elapsed: 697.205792ms
+Time elapsed: 418.303584ms
 
 // commented in main.go to avoid large output slice
-Loyal Customers: [2 8 13 15 19 22 25 35 40 4 ....................... ]
+Loyal Customers: [2 8 13 15 19 22 25 35 40 45 ....................... ]
 
 ```
+
+## Implementation
+
+### 1. Log Generation (seed/generator.go)
+
+- Generate structured slog log files for consecutive days
+- Provide a controlled dataset with mixed loyal and non-loyal customer activities
+
+### 2. Concurrent Log Processing (processor/processor.go)
+
+- Split files into chunks for parallel processing while preserving log integrity
+- NumOfChunks can be set to runtime.NumCPU() to utilize all cores.
+- Implement concurrent processing using goroutines and channels
+- Optimize file reading with buffered I/O and preallocated slices
+- Parse logs using fast byte-level operations, tailored for our JSON structure
+
+### 3. Loyal Customer Identification Algorithm (main.go)
+
+- Process log data from both days concurrently
+- Track user visits and unique page views using a map for efficient lookups
+- Apply loyal customer criteria: visits on both days and minimum unique pages
+- Generate a sorted list of loyal customer IDs
+
+**Further Reading:** [The One Billion Row Challenge in Go](https://benhoyt.com/writings/go-1brc/)
+
 # Directory structure
 ```
 log-analyzer/
@@ -45,40 +70,3 @@ log-analyzer/
 ├── README.md                  # Project documentation
 └── go.mod                     # Go module definition
 ```
-
-## Implementation
-
-### 1. Log Generation (Commented out in main.go)
-
-**Purpose**: Create test data for development and testing.
-
-- Generate two structured slog log files for consecutive days
-- Include a mix of loyal and non-loyal customer activities
-- Provide a controlled dataset for testing
-
-### 2. Concurrent Log Processing
-
-**Purpose**: Efficiently read and parse large log files.
-
-- Split each log file into multiple chunks (default: 4)
-- Can be changed to `NumOfChunks = runtime.NumCPU()` to utilize all cores in `processor.go`
-- Merge results from all chunks
-- Implement context-aware processing for timeout and cancellation handling
-
-### 3. Log Reading and Parsing
-
-**Purpose**: Extract structured data from log files.
-
-- Open and read log file chunks
-- Parse JSON-formatted log entries using `encoding/json`
-- Convert log data into `LogInfo` structs
-- Skip invalid JSON lines for robustness
-
-### 4. Loyal Customer Identification Algorithm
-
-**Purpose**: Apply loyalty criteria to identify loyal customers.
-
-- Process log data from both days
-- Track user visits and unique page views using a map
-- Apply loyal customer criteria (visits on both days and minimum unique pages)
-- Generate a sorted list of loyal customer IDs

@@ -7,7 +7,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ashtishad/log-analyzer/proccessor"
 	"github.com/ashtishad/log-analyzer/seed"
 )
 

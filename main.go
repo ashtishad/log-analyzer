@@ -7,7 +7,7 @@ import (
 	"sort"
 	"time"
 
-	"github.com/ashtishad/log-analyzer/proccessor"
+	"github.com/ashtishad/log-analyzer/processor"
 )
 
 const (
@@ -58,13 +58,13 @@ func main() {
 
 // processLogs reads log files for two consecutive days.
 // It utilizes concurrent processing for efficient handling of large log files.
-func processLogs(ctx context.Context) ([]proccessor.LogInfo, []proccessor.LogInfo, error) {
-	file1, err := proccessor.ReadLogFile(ctx, filepath.Join("seed", "files", "logs_2024-10-01.log"))
+func processLogs(ctx context.Context) ([]processor.LogInfo, []processor.LogInfo, error) {
+	file1, err := processor.ReadLogFile(ctx, filepath.Join("seed", "files", "logs_2024-10-01.log"))
 	if err != nil {
 		return nil, nil, fmt.Errorf("error reading file 1: %w", err)
 	}
 
-	file2, err := proccessor.ReadLogFile(ctx, filepath.Join("seed", "files", "logs_2024-10-02.log"))
+	file2, err := processor.ReadLogFile(ctx, filepath.Join("seed", "files", "logs_2024-10-02.log"))
 	if err != nil {
 		return nil, nil, fmt.Errorf("error reading file 2: %w", err)
 	}
@@ -74,7 +74,7 @@ func processLogs(ctx context.Context) ([]proccessor.LogInfo, []proccessor.LogInf
 
 // getLoyalCustomers identifies loyal customers based on visit frequency and unique page views.
 // It processes logs from two days and applies the loyalty criteria to generate a sorted list of loyal customer IDs.
-func getLoyalCustomers(ctx context.Context, page1, page2 []proccessor.LogInfo) ([]int64, error) {
+func getLoyalCustomers(ctx context.Context, page1, page2 []processor.LogInfo) ([]int64, error) {
 	userPages := make(map[int64]UserPageInfo)
 
 	if err := processDayLogs(ctx, userPages, page1, 1); err != nil {
@@ -112,7 +112,7 @@ func getLoyalCustomers(ctx context.Context, page1, page2 []proccessor.LogInfo) (
 
 // processDayLogs processes logs for a single day and updates the userPages map.
 // It's designed to be called for each day's logs, updating visit counts and page views efficiently.
-func processDayLogs(ctx context.Context, userPages map[int64]UserPageInfo, logs []proccessor.LogInfo, day int) error {
+func processDayLogs(ctx context.Context, userPages map[int64]UserPageInfo, logs []processor.LogInfo, day int) error {
 	for _, log := range logs {
 		select {
 		case <-ctx.Done():

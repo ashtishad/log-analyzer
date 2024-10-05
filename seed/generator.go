@@ -61,7 +61,7 @@ func generateLoyalCustomers() map[int64]bool {
 
 // generateFile creates a log file with simulated user activity for a specific date.
 // Generates entries for loyal customers, loyal customer has 6-6 pages visits
-// Then generate entries for non-loyal customers seperately.
+// Then generate entries for non-loyal customers separately.
 func generateFile(filename string, date time.Time, loyalCustomers map[int64]bool) error {
 	dir := filepath.Join("seed", "files")
 	if err := os.MkdirAll(dir, os.ModePerm); err != nil {

@@ -45,6 +45,8 @@ Loyal Customers: [2 8 13 15 19 22 25 35 40 45 ....................... ]
 - Apply loyal customer criteria: visits on both days and minimum unique pages
 - Generate a sorted list of loyal customer IDs
 
+**Further Reading:** [The One Billion Row Challenge in Go](https://benhoyt.com/writings/go-1brc/)
+
 # Directory structure
 ```
 log-analyzer/

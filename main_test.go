@@ -7,6 +7,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ashtishad/log-analyzer/processor"
 	"github.com/ashtishad/log-analyzer/seed"
 )
 
@@ -14,7 +15,7 @@ func TestGetLoyalCustomers(t *testing.T) {
 	day1 := time.Date(2024, 10, 1, 0, 0, 0, 0, time.UTC)
 	day2 := day1.AddDate(0, 0, 1)
 
-	file1 := []proccessor.LogInfo{
+	file1 := []processor.LogInfo{
 		{UserID: 1, PageName: "blog", Timestamp: day1},
 		{UserID: 1, PageName: "dashboard", Timestamp: day1},
 		{UserID: 1, PageName: "shop", Timestamp: day1},
@@ -29,7 +30,7 @@ func TestGetLoyalCustomers(t *testing.T) {
 		{UserID: 7, PageName: "blog", Timestamp: day1},
 	}
 
-	file2 := []proccessor.LogInfo{
+	file2 := []processor.LogInfo{
 		{UserID: 1, PageName: "blog", Timestamp: day2},
 		{UserID: 1, PageName: "about", Timestamp: day2},
 		{UserID: 2, PageName: "blog", Timestamp: day2},
@@ -59,7 +60,7 @@ func FuzzGetLoyalCustomers(f *testing.F) {
 		[]byte(`[{"userId":1,"pageName":"shop","timestamp":"2024-10-02T00:00:00Z"}]`))
 
 	f.Fuzz(func(t *testing.T, data1, data2 []byte) {
-		var file1, file2 []proccessor.LogInfo
+		var file1, file2 []processor.LogInfo
 
 		if err := json.Unmarshal(data1, &file1); err != nil {
 			return // invalid input, skip this iteration

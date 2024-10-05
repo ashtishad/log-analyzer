@@ -1,15 +1,18 @@
-# Log Analyzer for Loyal Customer Identification
+# Log Analyzer for Loyal Customer Identification from 1 million unique users and 1 million log entries per day.
 
 A tool to identify the most loyal customers by analyzing their activity logs, utilizing concurrent processing using file chunks for improved performance.
 
-## Expected Output
-```
-Loyal Customer Count: 1800
-Time elapsed: 21.90775ms
-Loyal Customers: [2 8 13 15 19 22 25 35 40 47 ....................... ]
-```
 
-## Directory structure
+# Expected Output
+```
+Loyal Customer Count: 180066
+Time elapsed: 697.205792ms
+
+// commented in main.go to avoid large output slice
+Loyal Customers: [2 8 13 15 19 22 25 35 40 4 ....................... ]
+
+```
+# Directory structure
 ```
 log-analyzer/
 │
@@ -37,7 +40,7 @@ log-analyzer/
 
 - Daily logs of customer activity in a structured JSON format
 - Log entry format: `{"userId": int, "pageName": string, "timestamp": ISO8601}`
-- 10,000 log entries per day, 10,000 unique customers, 20 pages
+- 1 million log entries per day, 1 million unique customers, 20 website pages/router group
 
 ## Loyal Customer Criteria
 
@@ -59,7 +62,7 @@ log-analyzer/
 **Purpose**: Efficiently read and parse large log files.
 
 - Split each log file into multiple chunks (default: 4)
-- Process chunks concurrently using goroutines
+- Can be changed to `NumOfChunks = runtime.NumCPU()` to utilize all cores in `processor.go`
 - Merge results from all chunks
 - Implement context-aware processing for timeout and cancellation handling
 
@@ -80,13 +83,3 @@ log-analyzer/
 - Track user visits and unique page views using a map
 - Apply loyal customer criteria (visits on both days and minimum unique pages)
 - Generate a sorted list of loyal customer IDs
-
-**Complexity**:
-- Time: O(n logn), where n is the total number of log entries
-- Space: O(m), where m is the number of unique users
-
-### 5. Performance Optimization
-
-- Concurrent processing of log files for improved speed
-- Use of efficient data structures (maps) for tracking user activity
-- Separate processing logic for each day's logs

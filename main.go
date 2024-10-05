@@ -12,7 +12,7 @@ import (
 
 const (
 	minLoyalPages = 4
-	timeout       = 200 * time.Millisecond
+	timeout       = 2 * time.Second
 )
 
 // UserPageInfo holds information about a user's page visits
@@ -22,8 +22,8 @@ type UserPageInfo struct {
 }
 
 // File format: Timestamp, PageId, CustomerId
-// every day new file(each has 10000 log entries)
-// find "loyal customers" from 10000 users.
+// every day new file(each has 1 million log entries)
+// find "loyal customers" from 1 million users.
 // (a) they came on both days.
 // (b) they visited at least 4 unique pages.
 func main() {
@@ -53,7 +53,7 @@ func main() {
 
 	fmt.Printf("Loyal Customer Count: %d\n", len(loyalCustomers))
 	fmt.Printf("Time elapsed: %v\n", elapsed)
-	fmt.Printf("Loyal Customers: %v\n", loyalCustomers)
+	// fmt.Printf("Loyal Customers: %v\n", loyalCustomers)
 }
 
 // processLogs reads log files for two consecutive days.

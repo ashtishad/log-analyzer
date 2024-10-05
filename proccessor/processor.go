@@ -10,7 +10,7 @@ import (
 )
 
 // NumOfChunks defines the number of parts to split the file into for concurrent processing
-const NumOfChunks = 4
+const NumOfChunks = 4 // or, Set runtime.NumCPU()
 
 // LogInfo represents a single log entry with user activity data.
 // It's structured to match the JSON format of the log/slog entries.

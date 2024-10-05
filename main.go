@@ -5,13 +5,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log/slog"
 	"os"
 	"path/filepath"
 	"sort"
 	"time"
-
-	"github.com/ashtishad/log-analyzer/seed"
 )
 
 // LogInfo represents a single log entry with user activity data.
@@ -32,10 +29,10 @@ const (
 // (a) they came on both days.
 // (b) they visited at least 4 unique pages.
 func main() {
-	if err := seed.GenerateLogFiles(); err != nil {
-		slog.Error("failed to generate log files", "err", err)
-		return
-	}
+	// if err := seed.GenerateLogFiles(); err != nil {
+	// 	slog.Error("failed to generate log files", "err", err)
+	// 	return
+	// }
 
 	start := time.Now()
 

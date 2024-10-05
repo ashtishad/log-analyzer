@@ -1,0 +1,30 @@
+name: Run unit tests
+
+on:
+  push:
+    branches: [ "master" ]
+
+  pull_request:
+    branches: [ "master" ]
+
+env:
+  GO_VERSION: '1.23.1'
+
+jobs:
+
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: ${{ env.GO_VERSION }}
+
+    - name: Build
+      run: go build -v ./...
+
+    - name: Run unit tests
+      run: go test -v ./...

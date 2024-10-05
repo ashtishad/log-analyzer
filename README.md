@@ -83,9 +83,3 @@ log-analyzer/
 - Track user visits and unique page views using a map
 - Apply loyal customer criteria (visits on both days and minimum unique pages)
 - Generate a sorted list of loyal customer IDs
-
-### 5. Performance Optimization
-
-- Concurrent processing of log files for improved speed
-- Use of efficient data structures (maps) for tracking user activity
-- Separate processing logic for each day's logs

@@ -1,27 +1,25 @@
 package main
 
 import (
-	"bufio"
 	"context"
-	"encoding/json"
 	"fmt"
-	"os"
 	"path/filepath"
 	"sort"
 	"time"
-)
 
-// LogInfo represents a single log entry with user activity data.
-type LogInfo struct {
-	UserID    int64     `json:"userId"`
-	PageName  string    `json:"pageName"`
-	Timestamp time.Time `json:"timestamp"`
-}
+	"github.com/ashtishad/log-analyzer/proccessor"
+)
 
 const (
 	minLoyalPages = 4
-	timeout       = 1000 * time.Millisecond
+	timeout       = 200 * time.Millisecond
 )
+
+// UserPageInfo holds information about a user's page visits
+type UserPageInfo struct {
+	pages     map[string]bool
+	visitDays int
+}
 
 // File format: Timestamp, PageId, CustomerId
 // every day new file(each has 10000 log entries)
@@ -55,17 +53,17 @@ func main() {
 
 	fmt.Printf("Loyal Customer Count: %d\n", len(loyalCustomers))
 	fmt.Printf("Time elapsed: %v\n", elapsed)
-	fmt.Printf("Loyal Customer IDs: %v\n", loyalCustomers)
 }
 
-// processLogs reads and parses log files for two consecutive days.
-func processLogs(ctx context.Context) ([]LogInfo, []LogInfo, error) {
-	file1, err := readLogFile(ctx, filepath.Join("seed", "files", "logs_2024-10-01.log"))
+// processLogs reads log files for two consecutive days.
+// It utilizes concurrent processing for efficient handling of large log files.
+func processLogs(ctx context.Context) ([]proccessor.LogInfo, []proccessor.LogInfo, error) {
+	file1, err := proccessor.ReadLogFile(ctx, filepath.Join("seed", "files", "logs_2024-10-01.log"))
 	if err != nil {
 		return nil, nil, fmt.Errorf("error reading file 1: %w", err)
 	}
 
-	file2, err := readLogFile(ctx, filepath.Join("seed", "files", "logs_2024-10-02.log"))
+	file2, err := proccessor.ReadLogFile(ctx, filepath.Join("seed", "files", "logs_2024-10-02.log"))
 	if err != nil {
 		return nil, nil, fmt.Errorf("error reading file 2: %w", err)
 	}
@@ -73,81 +71,16 @@ func processLogs(ctx context.Context) ([]LogInfo, []LogInfo, error) {
 	return file1, file2, nil
 }
 
-// readLogFile reads a log file and returns a slice of LogInfo.
-func readLogFile(ctx context.Context, filename string) ([]LogInfo, error) {
-	file, err := os.Open(filename)
-	if err != nil {
-		return nil, err
-	}
-
-	defer file.Close()
-
-	var logs []LogInfo
-
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		select {
-		case <-ctx.Done():
-			return nil, ctx.Err()
-		default:
-			var log LogInfo
-
-			if err := json.Unmarshal(scanner.Bytes(), &log); err != nil {
-				return nil, err
-			}
-
-			logs = append(logs, log)
-		}
-	}
-
-	if err := scanner.Err(); err != nil {
-		return nil, err
-	}
-
-	return logs, nil
-}
-
 // getLoyalCustomers identifies loyal customers based on visit frequency and unique page views.
-// Time Complexity: O(n log n), where n is the total number of log entries
-// Space Complexity: O(m), where m is the number of unique users
-func getLoyalCustomers(ctx context.Context, page1, page2 []LogInfo) ([]int64, error) {
-	userPages := make(map[int64]struct {
-		pages     map[string]bool
-		visitDays int
-	})
+// It processes logs from two days and applies the loyalty criteria to generate a sorted list of loyal customer IDs.
+func getLoyalCustomers(ctx context.Context, page1, page2 []proccessor.LogInfo) ([]int64, error) {
+	userPages := make(map[int64]UserPageInfo)
 
-	processDayLogs := func(logs []LogInfo, day int) error {
-		for _, log := range logs {
-			select {
-			case <-ctx.Done():
-				return ctx.Err()
-			default:
-				if _, ok := userPages[log.UserID]; !ok {
-					userPages[log.UserID] = struct {
-						pages     map[string]bool
-						visitDays int
-					}{pages: make(map[string]bool), visitDays: 0}
-				}
-
-				info := userPages[log.UserID]
-				info.pages[log.PageName] = true
-
-				if info.visitDays < day {
-					info.visitDays = day
-				}
-
-				userPages[log.UserID] = info
-			}
-		}
-
-		return nil
-	}
-
-	if err := processDayLogs(page1, 1); err != nil {
+	if err := processDayLogs(ctx, userPages, page1, 1); err != nil {
 		return nil, err
 	}
 
-	if err := processDayLogs(page2, 2); err != nil {
+	if err := processDayLogs(ctx, userPages, page2, 2); err != nil {
 		return nil, err
 	}
 
@@ -174,4 +107,30 @@ func getLoyalCustomers(ctx context.Context, page1, page2 []LogInfo) ([]int64, er
 	})
 
 	return loyalCustomers, nil
+}
+
+// processDayLogs processes logs for a single day and updates the userPages map.
+// It's designed to be called for each day's logs, updating visit counts and page views efficiently.
+func processDayLogs(ctx context.Context, userPages map[int64]UserPageInfo, logs []proccessor.LogInfo, day int) error {
+	for _, log := range logs {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		default:
+			info, ok := userPages[log.UserID]
+			if !ok {
+				info = UserPageInfo{pages: make(map[string]bool)}
+			}
+
+			info.pages[log.PageName] = true
+
+			if info.visitDays < day {
+				info.visitDays = day
+			}
+
+			userPages[log.UserID] = info
+		}
+	}
+
+	return nil
 }

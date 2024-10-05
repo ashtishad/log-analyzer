@@ -18,10 +18,10 @@ type LogEntry struct {
 }
 
 const (
-	totalUsers        = 10000
-	totalEntries      = 10000
-	loyalCustomerRate = 0.18 // 18% loyal customers
-	minLoyalPages     = 4    // Minimum number of unique pages for loyal customers
+	totalUsers        = 1000000 // 1 million
+	totalEntries      = 1000000 // 1 million
+	loyalCustomerRate = 0.18    // 18% loyal customers
+	minLoyalPages     = 4       // Minimum number of unique pages for loyal customers
 )
 
 var pages = []string{

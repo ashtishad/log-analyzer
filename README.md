@@ -1,7 +1,17 @@
-# Log Analyzer for Loyal Customer Identification from 1 million unique users and 1 million log entries per day.
+# Log Analyzer for Loyal Customer Identification
 
 A tool to identify the most loyal customers by analyzing their activity logs, utilizing concurrent processing using file chunks for improved performance.
 
+## Input Data
+
+- Daily logs of customer activity in a structured JSON format with log/slog.
+- Log entry format: `{"userId": int, "pageName": string, "timestamp": ISO8601}`
+- **1 million** log entries per day, **1 million** unique customers, 20 website pages/router group
+
+## Loyal Customer Criteria
+
+1. Visited on both days under analysis
+2. Accessed at least 4 unique pages
 
 # Expected Output
 ```
@@ -24,8 +34,8 @@ log-analyzer/
 │   └── generator.go           # Generates sample log data for testing
 │
 ├── files/
-│   ├── logs_2024-10-01.log    # Sample log file for day 1
-│   └── logs_2024-10-02.log    # Sample log file for day 2
+│   ├── logs_2024-10-01.log    # generated 1 million log entries from day 1
+│   └── logs_2024-10-02.log    # generated 1 million log entries from day 2
 │
 ├── proccessor/
 │   └── processor.go           # Core log processing logic
@@ -36,20 +46,9 @@ log-analyzer/
 └── go.mod                     # Go module definition
 ```
 
-## Input Data
-
-- Daily logs of customer activity in a structured JSON format
-- Log entry format: `{"userId": int, "pageName": string, "timestamp": ISO8601}`
-- 1 million log entries per day, 1 million unique customers, 20 website pages/router group
-
-## Loyal Customer Criteria
-
-1. Visited on both days under analysis
-2. Accessed at least 4 unique pages
-
 ## Implementation
 
-### 1. Log Generation (Seed Data)
+### 1. Log Generation (Commented out in main.go)
 
 **Purpose**: Create test data for development and testing.
 
